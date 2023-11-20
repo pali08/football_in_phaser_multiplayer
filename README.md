@@ -31,6 +31,7 @@ $ ifconfig
 the port 8081 is set in server.js -> server.listen and can be changed there
 
 How to play:
+The goal is to score as more goals than opponent (according to player agreement either in defined time, or defined number of goals)
 The player moves in his feets direction by upper arrow and can be rotated by left and right arrow. The goal is to score into opponent's gate. The ball starts to move once two players joined. Note that this is simple amateur game with some bugs, e.g. multiple browser tabs == multiple players.
 
 The game code was inspired by Scott Westover's tutorial:
