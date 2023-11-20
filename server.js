@@ -36,6 +36,22 @@ let velocity = {
 let cooldown = false;
 let player_actually_bouncing = null
 
+function handleGoal(goalRed, goalBlue) {
+  if (!cooldown) {
+    if (goalRed) {
+      scores.red += 1;
+    }
+    if (goalBlue) {
+      scores.blue += 1;
+    }
+    io.emit('scoreUpdate', scores);
+    cooldown = true;
+    setTimeout(() => {
+      cooldown = false;
+    }, 1000);
+  }
+}
+
 function updatePosition() {
   // Check for collisions with battleships (you need to implement this logic)
   const collisionWithBattleship = checkCollisionWithBattleships();
@@ -44,6 +60,29 @@ function updatePosition() {
     // Handle collision: change direction or perform any other necessary actions
     console.log('now collistion occured')
     handleCollision();
+    cooldown = true;
+    setTimeout(() => {
+      cooldown = false;
+    }, 1000);
+  }
+
+  const goalRed = checkGoal('red');
+  const goalBlue = checkGoal('blue');
+
+  // handleGoal(goalRed, goalBlue);
+
+  if (goalRed && !cooldown) {
+    scores.red += 1;
+    io.emit('scoreUpdate', scores);
+    cooldown = true;
+    setTimeout(() => {
+      cooldown = false;
+    }, 1000);
+  }
+  
+  if (goalBlue && !cooldown) {
+    scores.blue += 1;
+    io.emit('scoreUpdate', scores);
     cooldown = true;
     setTimeout(() => {
       cooldown = false;
@@ -71,6 +110,19 @@ function updatePosition() {
   io.emit('objectPosition', { width: objectPosition.width, height: objectPosition.height });
 }
 
+function checkGoal (team) {
+  let is_at_goal_line;
+  if (team == 'red') {
+    is_at_goal_line = star.x > 796
+  }
+  if (team == 'blue') {
+    is_at_goal_line = star.x < 4
+  }
+  if (is_at_goal_line && star.y > 146 && star.y < 375) {
+    return true;
+  }
+  return false;
+}
 
 
 function checkCollisionWithBattleships() {
@@ -117,8 +169,10 @@ io.on('connection', function (socket) {
   // create a new player and add it to our players object
   players[socket.id] = {
     rotation: 0,
-    x: Math.floor(Math.random() * 700) + 50,
-    y: Math.floor(Math.random() * 500) + 50,
+    x: (io.engine.clientsCount % 2 == 0) ? 200 : 600,
+    // x: Math.floor(Math.random() * 700) + 50,
+    y: 300,
+    // y: Math.floor(Math.random() * 500) + 50,
     playerId: socket.id,
     team: (io.engine.clientsCount % 2 == 0) ? 'red' : 'blue'
   };
