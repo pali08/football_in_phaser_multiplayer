@@ -20,16 +20,22 @@ var config = {
 var game = new Phaser.Game(config);
 
 function preload() {
-  this.load.image('ship', 'assets/spaceShips_001.png');
-  this.load.image('otherPlayer', 'assets/enemyBlack5.png');
-  this.load.image('star', 'assets/star_gold.png');
+  this.load.image('ship', 'assets/player_black.png');
+  this.load.image('otherPlayer', 'assets/player_black.png');
+  this.load.image('star', 'assets/ball.png');
+  this.load.image('playground', 'assets/playground.jpeg');
 }
 
 function create() {
   var self = this;
   this.socket = io();
+  var playground = this.add.image(config.width / 2, config.height / 2, 'playground');
+  playground.displayWidth = config.width;
+  playground.displayHeight = config.height;
   this.otherPlayers = this.physics.add.group();
   self.star = self.physics.add.image(400, 300, 'star');
+  self.star.displayHeight = self.star.height / 100
+  self.star.displayWidth = self.star.width / 100
   this.socket.on('currentPlayers', function (players) {
     Object.keys(players).forEach(function (id) {
       if (players[id].playerId === self.socket.id) {
@@ -72,14 +78,14 @@ function create() {
   this.socket.on('objectPosition', function (starLocation) {
     self.star.x = starLocation.width;
     self.star.y = starLocation.height;
-    this.socket.emit('starLocation', {x: self.star.x, y: self.star.y});
+    // this.socket.emit('starLocation', {x: self.star.x, y: self.star.y});
   });
 
 
 }
 
 function addPlayer(self, playerInfo) {
-  self.ship = self.physics.add.image(playerInfo.x, playerInfo.y, 'ship').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
+  self.ship = self.physics.add.image(playerInfo.x, playerInfo.y, 'ship').setOrigin(0.5, 0.5).setDisplaySize(45, 70);
   if (playerInfo.team === 'blue') {
     self.ship.setTint(0x0000ff);
   } else {
@@ -91,7 +97,7 @@ function addPlayer(self, playerInfo) {
 }
 
 function addOtherPlayers(self, playerInfo) {
-  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
+  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5).setDisplaySize(45, 70);
   if (playerInfo.team === 'blue') {
     otherPlayer.setTint(0x0000ff);
   } else {
